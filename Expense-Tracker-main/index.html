@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        /* Basic CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+        }
+        main {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        input[type="text"],
+        input[type="number"],
+        button {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #fff;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Expense Tracker</h1>
+    </header>
+    <main>
+        <section id="addExpense">
+            <h2>Add Expense</h2>
+            <input type="text" id="expenseName" placeholder="Expense Name">
+            <input type="number" id="expenseAmount" placeholder="Amount">
+            <button onclick="addExpense()">Add Expense</button>
+        </section>
+        <section id="expenses">
+            <h2>Expenses</h2>
+            <ul id="expenseList">
+                <!-- Expenses will be displayed here -->
+            </ul>
+        </section>
+    </main>
+    <script>
+        // Function to add expense
+        function addExpense() {
+            // Get input values
+            var name = document.getElementById('expenseName').value;
+            var amount = parseFloat(document.getElementById('expenseAmount').value);
+
+            // Validate inputs
+            if (name.trim() === '' || isNaN(amount) || amount <= 0) {
+                alert('Please enter valid expense details.');
+                return;
+            }
+
+            // Create expense object
+            var expense = {
+                name: name,
+                amount: amount
+            };
+
+            // Get existing expenses from localStorage
+            var expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+            // Add new expense to expenses array
+            expenses.push(expense);
+
+            // Save expenses to localStorage
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+
+            // Clear input fields
+            document.getElementById('expenseName').value = '';
+            document.getElementById('expenseAmount').value = '';
+
+            // Render expenses
+            renderExpenses();
+        }
+
+        // Function to delete expense
+        function deleteExpense(index) {
+            var expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+            expenses.splice(index, 1); // Remove expense at index
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            renderExpenses();
+        }
+
+        // Function to render expenses
+        function renderExpenses() {
+            var expenseList = document.getElementById('expenseList');
+            var expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+            // Clear expense list
+            expenseList.innerHTML = '';
+
+            // Loop through expenses and display them
+            expenses.forEach(function(expense, index) {
+                var li = document.createElement('li');
+                var deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = function() {
+                    deleteExpense(index);
+                };
+                li.textContent = expense.name + ': ₹' + expense.amount.toFixed(2);
+                li.appendChild(deleteBtn);
+                expenseList.appendChild(li);
+            });
+        }
+
+        // Initial rendering
+        renderExpenses();
+    </script>
+</body>
+</html>
